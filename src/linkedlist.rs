@@ -59,6 +59,36 @@ impl<'a, T> Iterator for Iter<'a, T> {
     }
 }
 
+/// An iterator over the elements of a linked list, allowing for them to be mutated.
+pub struct IterMut<'a, T> {
+    /// A reference to the current node.
+    current_node: Option<&'a mut LinkedListNode<T>>,
+}
+
+impl<'a, T> IterMut<'a, T> {
+    /// Create a mutable iterator from a linked list.
+    pub fn new(ll: &'a mut LinkedList<T>) -> Self {
+        Self {
+            current_node: ll.head.as_mut(),
+        }
+    }
+}
+
+impl<'a, T> Iterator for IterMut<'a, T> {
+    type Item = &'a mut T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.current_node.take() {
+            Some(node) => {
+                let (value, next) = node.get_mut();
+                self.current_node = next;
+                Some(value)
+            }
+            None => None,
+        }
+    }
+}
+
 /// A node in a linked list.
 #[derive(Clone, Debug)]
 struct LinkedListNode<T> {
@@ -72,6 +102,16 @@ impl<T> LinkedListNode<T> {
     /// Take the node's value and next node, consuming the node itself.
     pub fn take(self) -> (T, Option<LinkedListNode<T>>) {
         (self.value, self.next.map(|next| *next))
+    }
+
+    /// Get references to the value and next node in the linked list.
+    pub fn get(&self) -> (&T, Option<&LinkedListNode<T>>) {
+        (&self.value, self.next.as_ref().map(|next| &**next))
+    }
+
+    /// Get mutable references to the value and next node in the linked list.
+    pub fn get_mut(&mut self) -> (&mut T, Option<&mut LinkedListNode<T>>) {
+        (&mut self.value, self.next.as_mut().map(|next| &mut **next))
     }
 
     /// Get a reference to the node's value.
@@ -361,6 +401,11 @@ impl<T> LinkedList<T> {
     /// Returns an iterator over the elements in the linked list.
     pub fn iter<'a>(&'a self) -> Iter<'a, T> {
         Iter::new(self)
+    }
+
+    /// Returns an iterator over the elements in the linked list, allowing for them to be mutated.
+    pub fn iter_mut<'a>(&'a mut self) -> IterMut<'a, T> {
+        IterMut::new(self)
     }
 }
 

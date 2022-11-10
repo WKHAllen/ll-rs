@@ -228,6 +228,25 @@ mod tests {
     }
 
     #[test]
+    fn test_iter_mut() {
+        let mut ll1 = LinkedList::<i32>::new();
+        let mut ll1_iter = ll1.iter_mut();
+        assert_eq!(ll1_iter.next(), None);
+
+        let mut ll2 = LinkedList::from([2, 3, 5, 7]);
+        let mut ll2_iter = ll2.iter_mut();
+        assert_eq!(ll2_iter.next(), Some(&mut 2));
+        assert_eq!(ll2_iter.next(), Some(&mut 3));
+        assert_eq!(ll2_iter.next(), Some(&mut 5));
+        assert_eq!(ll2_iter.next(), Some(&mut 7));
+        assert_eq!(ll2_iter.next(), None);
+
+        let ll2_iter = ll2.iter_mut();
+        ll2_iter.for_each(|n| *n += 1);
+        assert_eq!(ll2, [3, 4, 6, 8].into());
+    }
+
+    #[test]
     fn test_default() {
         let ll1 = LinkedList::<i32>::new();
         let ll2 = LinkedList::default();
