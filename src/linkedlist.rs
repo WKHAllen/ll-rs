@@ -6,15 +6,23 @@ use std::vec::IntoIter;
 
 /// Linked list errors.
 pub enum LinkedListError {
-    IndexOutOfBounds,
-    InvalidArraySize,
+    IndexOutOfBounds { index: usize, size: usize },
+    InvalidArraySize { size: usize, array_size: usize },
 }
 
 impl std::fmt::Debug for LinkedListError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match *self {
-            Self::IndexOutOfBounds => write!(f, "index out of bounds"),
-            Self::InvalidArraySize => write!(f, "invalid array size"),
+            Self::IndexOutOfBounds { index, size } => write!(
+                f,
+                "index out of bounds; linked list size: {}, provided index: {}",
+                size, index
+            ),
+            Self::InvalidArraySize { size, array_size } => write!(
+                f,
+                "invalid array size; linked list size: {}, array size: {}",
+                size, array_size
+            ),
         }
     }
 }
@@ -165,7 +173,10 @@ impl<T> LinkedList<T> {
 
             Ok(current.get_value())
         } else {
-            Err(LinkedListError::IndexOutOfBounds)
+            Err(LinkedListError::IndexOutOfBounds {
+                index,
+                size: self.size,
+            })
         }
     }
 
@@ -180,7 +191,10 @@ impl<T> LinkedList<T> {
 
             Ok(current.get_value_mut())
         } else {
-            Err(LinkedListError::IndexOutOfBounds)
+            Err(LinkedListError::IndexOutOfBounds {
+                index,
+                size: self.size,
+            })
         }
     }
 
@@ -197,7 +211,10 @@ impl<T> LinkedList<T> {
 
             Ok(())
         } else {
-            Err(LinkedListError::IndexOutOfBounds)
+            Err(LinkedListError::IndexOutOfBounds {
+                index,
+                size: self.size,
+            })
         }
     }
 
@@ -223,7 +240,10 @@ impl<T> LinkedList<T> {
 
             Ok(())
         } else {
-            Err(LinkedListError::IndexOutOfBounds)
+            Err(LinkedListError::IndexOutOfBounds {
+                index,
+                size: self.size,
+            })
         }
     }
 
@@ -275,7 +295,10 @@ impl<T> LinkedList<T> {
 
             Ok(node.take_value())
         } else {
-            Err(LinkedListError::IndexOutOfBounds)
+            Err(LinkedListError::IndexOutOfBounds {
+                index,
+                size: self.size,
+            })
         }
     }
 
@@ -288,7 +311,7 @@ impl<T> LinkedList<T> {
 
             Ok(node.take_value())
         } else {
-            Err(LinkedListError::IndexOutOfBounds)
+            Err(LinkedListError::IndexOutOfBounds { index: 0, size: 0 })
         }
     }
 
@@ -311,7 +334,7 @@ impl<T> LinkedList<T> {
 
             Ok(node.take_value())
         } else {
-            Err(LinkedListError::IndexOutOfBounds)
+            Err(LinkedListError::IndexOutOfBounds { index: 0, size: 0 })
         }
     }
 
@@ -412,7 +435,10 @@ impl<T: std::fmt::Debug, const N: usize> TryInto<[T; N]> for LinkedList<T> {
             let vector: Vec<_> = self.into();
             Ok(vector.try_into().unwrap())
         } else {
-            Err(LinkedListError::InvalidArraySize)
+            Err(LinkedListError::InvalidArraySize {
+                size: self.size,
+                array_size: N,
+            })
         }
     }
 }
