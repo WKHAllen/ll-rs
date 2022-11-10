@@ -22,6 +22,35 @@ impl std::fmt::Debug for LinkedListError {
 /// Linked list result type.
 pub type Result<T> = core::result::Result<T, LinkedListError>;
 
+/// An iterator over the elements of a linked list.
+pub struct Iter<'a, T> {
+    /// A reference to the current node.
+    current_node: Option<&'a LinkedListNode<T>>,
+}
+
+impl<'a, T> Iter<'a, T> {
+    /// Create an iterator from a linked list.
+    pub fn new(ll: &'a LinkedList<T>) -> Self {
+        Self {
+            current_node: ll.head.as_ref(),
+        }
+    }
+}
+
+impl<'a, T> Iterator for Iter<'a, T> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.current_node {
+            Some(node) => {
+                self.current_node = node.get_next();
+                Some(&**node)
+            }
+            None => None,
+        }
+    }
+}
+
 /// A node in a linked list.
 #[derive(Clone, Debug)]
 struct LinkedListNode<T> {
@@ -304,6 +333,11 @@ impl<T> LinkedList<T> {
             let value = orig.pop_front().unwrap();
             self.push(0, value).unwrap();
         }
+    }
+
+    /// Returns an iterator over the elements in the linked list.
+    pub fn iter<'a>(&'a self) -> Iter<'a, T> {
+        Iter::new(self)
     }
 }
 

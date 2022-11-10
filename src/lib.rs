@@ -213,6 +213,21 @@ mod tests {
     }
 
     #[test]
+    fn test_iter() {
+        let ll1 = LinkedList::<i32>::new();
+        let mut ll1_iter = ll1.iter();
+        assert_eq!(ll1_iter.next(), None);
+
+        let ll2 = LinkedList::from([2, 3, 5, 7]);
+        let mut ll2_iter = ll2.iter();
+        assert_eq!(ll2_iter.next(), Some(&2));
+        assert_eq!(ll2_iter.next(), Some(&3));
+        assert_eq!(ll2_iter.next(), Some(&5));
+        assert_eq!(ll2_iter.next(), Some(&7));
+        assert_eq!(ll2_iter.next(), None);
+    }
+
+    #[test]
     fn test_default() {
         let ll1 = LinkedList::<i32>::new();
         let ll2 = LinkedList::default();
